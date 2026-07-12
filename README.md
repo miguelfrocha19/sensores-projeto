@@ -1,13 +1,10 @@
 # Projeto Sensores de Temperatura
 
-Mini-projeto de estudo para a stack da SyOS. Dois usuários com permissões
+Mini-projeto de estudo. Dois usuários com permissões
 diferentes:
 
 - **Gerente** — CRUD completo de sensores.
 - **Funcionário** — apenas consulta o status dos sensores.
-
-O backend (Express + MySQL) espelha o mundo do **Besashi Server**; o frontend
-(Next.js App Router) espelha o mundo do **Super Easy**.
 
 > **Sobre os arquivos:** eles vêm como stubs. Cada arquivo-fonte tem no topo um
 > comentário dizendo **para que serve** e **em qual fase** você o preenche. Os
@@ -19,8 +16,6 @@ O backend (Express + MySQL) espelha o mundo do **Besashi Server**; o frontend
 
 ## Arquitetura do backend
 
-Arquitetura em camadas (o mesmo padrão que o NestJS te obriga a seguir no Super
-Easy, aqui feito na mão para você entender *por que* ele existe):
 
 ```
 rota -> controller -> service -> repository -> banco
@@ -139,63 +134,3 @@ sensores-frontend/
 └── next.config.js
 ```
 
----
-
-## Redis e RabbitMQ (só o conceito)
-
-- **Redis (cache/sessão)** — a tela de status é consultada o tempo todo. Guardar
-  o último status por sensor num cache com expiração evita bater no MySQL a cada
-  acesso. (Ou guardar as sessões de login.)
-- **RabbitMQ (filas)** — quando uma leitura passa do `max_threshold`, publica-se
-  uma mensagem numa fila em vez de mandar notificação na hora; um consumidor
-  separado processa depois. Desacoplamento.
-
-Não precisam ser implementados no escopo — apenas saber onde encaixariam.
-
----
-
-## Fases de desenvolvimento
-
-| Fase | O que fazer |
-|------|-------------|
-| 0 | Preparação: pastas, `package.json`, `tsconfig.json`, `docker-compose` só com MySQL. |
-| 1 | Banco: `schema.sql` + `seed.sql` (CREATE TABLE, FK, ENUM). |
-| 2 | Config e tipos: `env.ts`, `database.ts`, `types/`. |
-| 3 | Fatia vertical: CRUD de sensores **sem auth** (repo -> service -> controller -> rota). |
-| 4 | Autenticação: usuários, login, hash de senha, JWT, `auth.middleware`. |
-| 5 | Proteção por role: `role.middleware` nas rotas de escrita. 401 vs 403. |
-| 6 | Leituras e status: JOIN e GROUP BY. |
-| 7 | Redis e RabbitMQ (conceito): marcar onde encaixam. |
-| 8 | Frontend: login (`"use client"`, useState, `lib/api.ts`). |
-| 9 | Frontend: lista de status (funcionário) com `useSensors`/`useEffect`. |
-| 10 | Frontend: gerenciamento (gerente) com `SensorForm` (POST/PUT/DELETE). |
-| 11 | Docker Compose completo: MySQL + backend + frontend. |
-| 12 | Acabamento: erros, mensagens, estilo. |
-
----
-
-## Mapa: tópico do guia -> onde pratica
-
-- const/let, arrow, destructuring, spread/rest, import/export -> o projeto todo.
-- async/await, Promises -> Fases 3 a 6.
-- TypeScript (tipos, interface, type, generics) -> Fase 2 em diante.
-- HTTP / verbos / status codes / JSON -> Fases 3, 5, 6.
-- Node event loop + CommonJS -> Fase 0/3.
-- Express (middleware, rota, req/res) -> Fases 3, 4, 5.
-- SQL (SELECT, JOIN, WHERE, GROUP BY) -> Fases 1 e 6.
-- Redis e RabbitMQ (propósito) -> Fase 7.
-- React (componentes, props, state, hooks, SPA) -> Fases 8, 9, 10.
-- Next.js App Router (pastas, Server vs Client, layouts) -> Fases 8 a 10.
-- Docker (container, docker compose up) -> Fases 0 e 11.
-
-Ponte para o dia a dia: na Fase 9 você busca dados com `useEffect` na mão. No
-Super Easy isso é **TanStack Query**. Trocar o `useSensors` por TanStack Query
-ao final é o próximo passo natural.
-
----
-
-## Como trabalhar
-
-Siga as fases na ordem. Quando for atacar um arquivo, peça a especificação dele
-— você recebe o que aquele código precisa conter (funções, responsabilidades, o
-que importar, casos a tratar), escreve, e manda para revisão.
