@@ -1,0 +1,16 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: sensores-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: sensores_dev_pw
+      MYSQL_DATABASE: sensores
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sensores-backend/sql:/docker-entrypoint-initdb.d:ro
+
+volumes:
+  mysql_data:
